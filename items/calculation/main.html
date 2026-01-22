@@ -2,7 +2,7 @@
 <html manifest_no_use="gen3D.manifest1">
 <head>
 <meta charset="utf-8">
-<title>3D Structure Generator</title>
+<title>3D Structure Generator - Final Fix</title>
 
 	<script src="../../libs/Three.js"></script>
 	<script src="../../libs/raphael-min.2.0.1.js"></script>
@@ -10,11 +10,9 @@
 	<link rel="stylesheet" type="text/css" href="../../libs/kekule/themes/default/kekule.css" />
 	
 	<style>
-		/* 基本レイアウト */
 		body {
-			background-color: #0f172a;
-			color: #f8fafc;
-			font-family: sans-serif;
+			background-color: #111;
+			color: #eee;
 			margin: 0;
 			display: flex;
 			flex-direction: column;
@@ -23,58 +21,50 @@
 		}
 
 		#state {
-			height: 2.5em;
-			line-height: 2.5;
-			font-weight: bold;
+			background: #222;
+			padding: 5px;
 			text-align: center;
-			background: #1e293b;
-			color: #38bdf8;
-			border-bottom: 1px solid #475569;
+			color: #00d4ff;
+			border-bottom: 1px solid #444;
 		}
 
-		/* 左右を分けるコンテナ */
-		.main-content {
+		/* 左右をテーブル状に完全に分けるコンテナ */
+		.main-container {
 			display: flex;
 			flex: 1;
-			flex-direction: row;
-			gap: 15px;
-			padding: 15px;
+			width: 100vw;
 			box-sizing: border-box;
-			min-height: 0;
-		}
-
-		/* それぞれのBOX（囲み） */
-		.tool-box {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			background: #1e293b;
-			border: 1px solid #334155;
-			border-radius: 8px;
 			overflow: hidden;
-			position: relative; /* ウィジェットの基準点 */
 		}
 
-		/* ボックス内のウィジェットを最大表示 */
+		.widget-wrapper {
+			flex: 1;
+			position: relative; /* ウィジェット配置の基準点 */
+			border: 1px solid #444;
+			box-sizing: border-box;
+		}
+
+		/* ウィジェット本体を親要素いっぱいに広げる */
 		#composer, #chemViewer {
+			position: absolute !important;
+			top: 0; left: 0; right: 0; bottom: 0;
 			width: 100% !important;
 			height: 100% !important;
-			flex: 1;
 		}
 
-		/* 3Dビューアのツールバー常時表示設定 */
+		/* 3DビューアのツールバーをCSSで最前面に固定 */
 		.K-ChemWidget-Toolbar {
 			opacity: 1 !important;
 			visibility: visible !important;
-			display: flex !important;
-			background: rgba(30, 41, 59, 0.95) !important;
+			background: rgba(50, 50, 50, 0.9) !important;
+			z-index: 1000 !important;
 		}
 
 		#description {
-			padding: 10px 20px;
-			background: #1e293b;
-			font-size: 0.85em;
-			border-top: 1px solid #475569;
+			background: #222;
+			padding: 10px;
+			font-size: 12px;
+			border-top: 1px solid #444;
 		}
 	</style>
 
@@ -94,67 +84,65 @@
 		return Kekule.ChemStructureUtils.getTotalStructFragment(composer.getChemObj());
 	}
 	
-	function calcStart() {
-		btnGen.setEnabled(false);
-		btnTerminate.setEnabled(true);
-		timeStart = Date.now();
-	}
-	function calcEnd() {
-		btnGen.setEnabled(true);
-		btnTerminate.setEnabled(false);
-		timeEnd = Date.now();
-	}
-		
 	function generate3D() {
 		var mol = getCurrMol();
 		report('Calculating...');
-		calcStart();
+		btnGen.setEnabled(false);
+		btnTerminate.setEnabled(true);
+		timeStart = Date.now();
+		
 		calculator = Kekule.Calculator.generate3D(mol, {'forceField': ''},
 			function(generatedMol){
-				calcEnd();
+				btnGen.setEnabled(true);
+				btnTerminate.setEnabled(false);
+				timeEnd = Date.now();
 				var elapse = (timeEnd - timeStart) / 1000;
 				viewer.setChemObj(generatedMol);
 				report('Calculation done in ' + elapse + ' sec');
 			},
 			function(err) {
-				if (err) {
-					calcEnd();
-					report(err.getMessage? err.getMessage(): err);
-					Kekule.error(err);					
-				}
+				btnGen.setEnabled(true);
+				btnTerminate.setEnabled(false);
+				report(err.getMessage ? err.getMessage() : err);
 			}
 		);
 	}
+
 	function terminate() {
-		report('Terminated by user');
-		calcEnd();
-		if (calculator) {
-			calculator.halt();			
-		}		
+		report('Terminated');
+		btnGen.setEnabled(true);
+		btnTerminate.setEnabled(false);
+		if (calculator) calculator.halt();
+	}
+
+	// 描画サイズを強制的に更新する関数
+	function resizeWidgets() {
+		if (composer) composer.notifyObjectSizeChanged();
+		if (viewer) viewer.notifyObjectSizeChanged();
 	}
 	
 	function init() {
 		viewer = Kekule.Widget.getWidgetById('chemViewer');
 		composer = Kekule.Widget.getWidgetById('composer');
 		
+		// ボタン追加
 		var toolButtons = composer.getCommonToolButtons() || composer.getDefaultCommonToolBarButtons();
-		
 		toolButtons.push({
-			'id': 'btnGen',
-			'text': 'Generate 3D', 'hint': 'Generate 3D structure', 'showText': true, 'showGlyph': false, 'cssText': 'width:auto',
-			'#execute': generate3D
+			'id': 'btnGen', 'text': 'Generate 3D', 'showText': true, 'cssText': 'width:auto', '#execute': generate3D
 		});
 		toolButtons.push({
-			'id': 'btnTerminate',
-			'text': 'Terminate', 'hint': 'Terminate calculation', 'showText': true, 'showGlyph': false, 'cssText': 'width:auto',
-			'#execute': terminate
+			'id': 'btnTerminate', 'text': 'Terminate', 'showText': true, 'cssText': 'width:auto', '#execute': terminate
 		});
-		
 		composer.setCommonToolButtons(toolButtons);
 		
 		btnGen = Kekule.Widget.getWidgetById('btnGen');
 		btnTerminate = Kekule.Widget.getWidgetById('btnTerminate');
 		btnTerminate.setEnabled(false);
+
+		// ウィンドウのリサイズイベントに登録
+		window.addEventListener('resize', resizeWidgets);
+		// 初期ロード後にもう一度サイズを確定させる
+		setTimeout(resizeWidgets, 100);
 	}
 	
 	Kekule.X.domReady(init);
@@ -162,26 +150,20 @@
 </head>
 
 <body>
-
 	<div id="state">Ready</div>
 
-	<div class="main-content">
-		<!-- 2D BOX -->
-		<div class="tool-box">
+	<div class="main-container">
+		<div class="widget-wrapper">
 			<div id="composer" data-widget="Kekule.Editor.Composer" data-chem-obj="url(#molSrc)" data-predefined-setting="molOnly"></div>
 		</div>
-		
-		<!-- 3D BOX -->
-		<div class="tool-box">
+		<div class="widget-wrapper">
 			<div id="chemViewer" data-widget="Kekule.ChemWidget.Viewer3D" data-predefined-setting="fullFunc" 
-				data-toolbar-evoke-modes=""
-				data-toolbar-pos="1" data-toolbar-margin-horizontal="0" data-toolbar-margin-vertical="0"></div>
+				data-toolbar-evoke-modes="" data-toolbar-pos="1"></div>
 		</div>
 	</div>
 
 	<div id="description">
-		<p>Draw molecules on the left, then click <b>"Generate 3D"</b> to calculate. Interaction buttons are always visible.</p>
+		2Dで編集し「Generate 3D」をクリックしてください。左右分割で全画面表示されます。
 	</div>
-
 </body>
 </html>
