@@ -57,7 +57,7 @@
 		.main-container {
 			display: flex;
 			flex: 1;
-			flex-direction: column; /* 上下並び */
+			flex-direction: column;
 			gap: 12px;
 			padding: 12px;
 			box-sizing: border-box;
@@ -65,7 +65,7 @@
 		}
 
 		.tool-section {
-			flex: 1; /* 上下均等 */
+			flex: 1;
 			display: flex;
 			flex-direction: column;
 			background-color: var(--white);
@@ -90,7 +90,7 @@
 		/* ウィジェットをBOX内で最大化 */
 		#composer, #chemViewer {
 			position: absolute !important;
-			top: 28px; /* headerの高さ分下げて配置 */
+			top: 28px;
 			left: 0;
 			right: 0;
 			bottom: 0;
@@ -143,7 +143,7 @@
 				timeEnd = Date.now();
 				var elapse = (timeEnd - timeStart) / 1000;
 				viewer.setChemObj(generatedMol);
-				report('Ready - Computed in ' + elapse + 's');
+				report('Ready - Done in ' + elapse + 's');
 			},
 			function(err) {
 				btnGen.setEnabled(true);
@@ -171,11 +171,12 @@
 		
 		var toolButtons = composer.getCommonToolButtons() || composer.getDefaultCommonToolBarButtons();
 		
+		// 装飾(cssText)をデフォルト（width:autoのみ）に変更
 		toolButtons.push({
-			'id': 'btnGen', 'text': 'Generate 3D', 'hint': 'Optimize to 3D', 'showText': true, 'cssText': 'width:auto; color:#fff; background:#1a73e8; font-weight:bold;', '#execute': generate3D
+			'id': 'btnGen', 'text': 'Generate 3D', 'hint': 'Generate 3D structure', 'showText': true, 'showGlyph': false, 'cssText': 'width:auto', '#execute': generate3D
 		});
 		toolButtons.push({
-			'id': 'btnTerminate', 'text': 'Terminate', 'hint': 'Stop Calculation', 'showText': true, 'cssText': 'width:auto;', '#execute': terminate
+			'id': 'btnTerminate', 'text': 'Terminate', 'hint': 'Terminate calculation', 'showText': true, 'showGlyph': false, 'cssText': 'width:auto', '#execute': terminate
 		});
 		
 		composer.setCommonToolButtons(toolButtons);
@@ -212,7 +213,7 @@
 	</div>
 
 	<footer>
-		ブラウザ上で動作する分子構造計算ツールです。2Dで構造を描画し「Generate 3D」をクリックしてください。
+		2Dで構造を描画し「Generate 3D」をクリックしてください。このツールはブラウザ上でのみ計算を行います。
 	</footer>
 </body>
 </html>
