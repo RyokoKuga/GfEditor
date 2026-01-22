@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>3D Structure Generator - Professional Edition</title>
+<title>3D Structure Generator - Vertical Edition</title>
 
 	<!-- ライブラリ読み込み -->
 	<script src="../../libs/Three.js"></script>
@@ -11,13 +11,12 @@
 	<link rel="stylesheet" type="text/css" href="../../libs/kekule/themes/default/kekule.css" />
 	
 	<style>
-		/* Chromeライクなモダン・ライトデザイン */
+		/* Chromeベースのモダン・ライトデザイン */
 		:root {
 			--chrome-bg: #f1f3f4;
 			--chrome-border: #dadce0;
 			--chrome-text: #3c4043;
 			--chrome-blue: #1a73e8;
-			--chrome-blue-hover: #1765cc;
 			--white: #ffffff;
 		}
 
@@ -32,7 +31,6 @@
 			overflow: hidden;
 		}
 
-		/* ヘッダーエリア */
 		header {
 			background-color: var(--white);
 			padding: 10px 20px;
@@ -40,16 +38,11 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+			box-shadow: 0 1px 3px rgba(60,64,67,.15);
 			z-index: 100;
 		}
 
-		h1 {
-			margin: 0;
-			font-size: 18px;
-			font-weight: 500;
-			color: var(--chrome-text);
-		}
+		h1 { margin: 0; font-size: 18px; font-weight: 500; }
 
 		#state {
 			font-size: 13px;
@@ -60,10 +53,11 @@
 			font-weight: 500;
 		}
 
-		/* メインコンテンツ（左右分割） */
+		/* 上下分割コンテナ */
 		.main-container {
 			display: flex;
 			flex: 1;
+			flex-direction: column; /* 上下並び */
 			gap: 12px;
 			padding: 12px;
 			box-sizing: border-box;
@@ -71,74 +65,65 @@
 		}
 
 		.tool-section {
-			flex: 1;
+			flex: 1; /* 上下均等 */
 			display: flex;
 			flex-direction: column;
 			background-color: var(--white);
 			border: 1px solid var(--chrome-border);
 			border-radius: 8px;
-			box-shadow: 0 1px 2px 0 rgba(60,64,67,.3);
+			box-shadow: 0 1px 2px rgba(60,64,67,.3);
 			overflow: hidden;
 			position: relative;
 		}
 
 		.section-header {
-			padding: 8px 15px;
+			padding: 6px 15px;
 			background: #f8f9fa;
 			border-bottom: 1px solid var(--chrome-border);
-			font-size: 12px;
+			font-size: 11px;
 			font-weight: bold;
 			color: #5f6368;
 			text-transform: uppercase;
+			z-index: 5;
 		}
 
 		/* ウィジェットをBOX内で最大化 */
 		#composer, #chemViewer {
 			position: absolute !important;
-			top: 35px; /* header分 */
+			top: 28px; /* headerの高さ分下げて配置 */
 			left: 0;
 			right: 0;
 			bottom: 0;
 			width: 100% !important;
-			height: calc(100% - 35px) !important;
+			height: calc(100% - 28px) !important;
 		}
 
-		/* 3Dツールバーの常時表示設定 */
+		/* 3Dツールバーを常に表示 */
 		.K-ChemWidget-Toolbar {
 			opacity: 1 !important;
 			visibility: visible !important;
-			background: rgba(255, 255, 255, 0.9) !important;
+			background: rgba(255, 255, 255, 0.95) !important;
 			border: 1px solid var(--chrome-border) !important;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 		}
 
-		/* フッター説明 */
 		footer {
 			background-color: var(--white);
-			padding: 8px 20px;
-			font-size: 12px;
+			padding: 6px 20px;
+			font-size: 11px;
 			color: #70757a;
 			border-top: 1px solid var(--chrome-border);
-		}
-
-		/* KekuleボタンをChrome風に */
-		.K-Button {
-			border-radius: 4px !important;
-			transition: background 0.2s !important;
 		}
 	</style>
 
 	<script id="molSrc" type="chemical/x-kekule-json">
-	{"id":"m1","info":{"generator":"ChemDraw","date":{"__type__":"date","date":"Sat, 05 Sep 2015 11:46:28 GMT"},"__type__":"object"},"renderOptions":{"expanded":true,"__type__":"object"},"coord2D":{"x":12.375,"y":37.3811,"__type__":"object"},"charge":0,"parity":null,"ctab":{"nodes":[{"__type__":"Kekule.Atom","id":"a4","coord2D":{"x":0.7958,"y":0.4315,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a11","coord2D":{"x":0.0117,"y":0.1764,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a5","coord2D":{"x":0.7958,"y":1.2565,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a3","coord2D":{"x":1.5115,"y":0.0175,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a14","coord2D":{"x":0.0117,"y":-1.4648,"__type__":"object"},"charge":0,"parity":0,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a7","coord2D":{"x":-0.4738,"y":0.8439,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a6","coord2D":{"x":1.5115,"y":1.6689,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a8","coord2D":{"x":0.0117,"y":1.5115,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a2","coord2D":{"x":2.2257,"y":0.4315,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a15","coord2D":{"x":-1.1048,"y":-1.0509,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"O"},{"__type__":"Kekule.Atom","id":"a13","coord2D":{"x":-0.4095,"y":-1.9488,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a21","coord2D":{"x":0.0117,"y":-2.1732,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a1","coord2D":{"x":2.2257,"y":1.2565,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a9","coord2D":{"x":1.5115,"y":2.4939,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"O"},{"__type__":"Kekule.Atom","id":"a10","coord2D":{"x":2.9428,"y":0.0175,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a16","coord2D":{"x":-2.2272,"y":-1.4648,"__type__":"object"},"charge":0,"parity":0,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a12","coord2D":{"x":-1.7972,"y":-1.9488,"__type__":"object"},"charge":0,"parity":0,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a19","coord2D":{"x":-0.4095,"y":-1.5231,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a17","coord2D":{"x":-0.4095,"y":-2.4939,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a22","coord2D":{"x":-2.2272,"y":-0.8031,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a23","coord2D":{"x":-2.2272,"y":-2.1732,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a18","coord2D":{"x":-1.7972,"y":-2.4939,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"O"},{"__type__":"Kekule.Atom","id":"a20","coord2D":{"x":-1.7972,"y":-1.5231,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a24","coord2D":{"x":-2.9428,"y":-0.3892,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"O"}],"anchorNodes":[],"connectors":[{"__type__":"Kekule.Bond","id":"b25","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b4","parity":null,"bondType":"covalent","bondOrder":2,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b3","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b23","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b26","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b5","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b8","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b2","parity":null,"bondType":"covalent","bondOrder":2,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b13","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b12","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b20","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b7","parity":null,"bondType":"covalent","bondOrder":2,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b6","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b9","bondType":"covalent","bondOrder":2,"electronCount":4,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b1","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b10","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b14","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b11","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b18","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b16","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b15","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b21","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b22","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b17","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b19","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b24","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":}],"__type":"Kekule.StructureConnectionTable"},"name":"Untitled Document-1","__type":"Kekule.Molecule"}
+	{"id":"m1","info":{"generator":"ChemDraw","date":{"__type__":"date","date":"Sat, 05 Sep 2015 11:46:28 GMT"},"__type__":"object"},"renderOptions":{"expanded":true,"__type__":"object"},"coord2D":{"x":12.375,"y":37.3811,"__type__":"object"},"charge":0,"parity":null,"ctab":{"nodes":[{"__type__":"Kekule.Atom","id":"a4","coord2D":{"x":0.7958,"y":0.4315,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a11","coord2D":{"x":0.0117,"y":0.1764,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a5","coord2D":{"x":0.7958,"y":1.2565,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a3","coord2D":{"x":1.5115,"y":0.0175,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a14","coord2D":{"x":0.0117,"y":-1.4648,"__type__":"object"},"charge":0,"parity":0,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a7","coord2D":{"x":-0.4738,"y":0.8439,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a6","coord2D":{"x":1.5115,"y":1.6689,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a8","coord2D":{"x":0.0117,"y":1.5115,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a2","coord2D":{"x":2.2257,"y":0.4315,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a15","coord2D":{"x":-1.1048,"y":-1.0509,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"O"},{"__type__":"Kekule.Atom","id":"a13","coord2D":{"x":-0.4095,"y":-1.9488,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a21","coord2D":{"x":0.0117,"y":-2.1732,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a1","coord2D":{"x":2.2257,"y":1.2565,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a9","coord2D":{"x":1.5115,"y":2.4939,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"O"},{"__type__":"Kekule.Atom","id":"a10","coord2D":{"x":2.9428,"y":0.0175,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"N"},{"__type__":"Kekule.Atom","id":"a16","coord2D":{"x":-2.2272,"y":-1.4648,"__type__":"object"},"charge":0,"parity":0,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a12","coord2D":{"x":-1.7972,"y":-1.9488,"__type__":"object"},"charge":0,"parity":0,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a19","coord2D":{"x":-0.4095,"y":-1.5231,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a17","coord2D":{"x":-0.4095,"y":-2.4939,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a22","coord2D":{"x":-2.2272,"y":-0.8031,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"C"},{"__type__":"Kekule.Atom","id":"a23","coord2D":{"x":-2.2272,"y":-2.1732,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a18","coord2D":{"x":-1.7972,"y":-2.4939,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"O"},{"__type__":"Kekule.Atom","id":"a20","coord2D":{"x":-1.7972,"y":-1.5231,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"H"},{"__type__":"Kekule.Atom","id":"a24","coord2D":{"x":-2.9428,"y":-0.3892,"__type__":"object"},"charge":0,"parity":null,"isotopeId":"O"}],"anchorNodes":[],"connectors":[{"__type__":"Kekule.Bond","id":"b25","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b4","parity":null,"bondType":"covalent","bondOrder":2,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b3","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b23","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b26","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b5","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b8","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b2","parity":null,"bondType":"covalent","bondOrder":2,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b13","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b12","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b20","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b7","parity":null,"bondType":"covalent","bondOrder":2,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b6","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b9","bondType":"covalent","bondOrder":2,"electronCount":4,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b1","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":3,"isInAromaticRing":true,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b10","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b14","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b11","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b18","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b16","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b15","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b21","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b22","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b17","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b19","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":},{"__type__":"Kekule.Bond","id":"b24","parity":null,"bondType":"covalent","bondOrder":1,"electronCount":2,"isInAromaticRing":false,"connectedNodes":}],"__type":"Kekule.StructureConnectionTable"},"name":"Adenosine-Initial","__type":"Kekule.Molecule"}
 	</script>
 	
 	<script>
 	var composer, viewer, btnGen, btnTerminate;	
 	var calculator, timeStart, timeEnd;
 	
-	function report(msg) {
-		document.getElementById('state').innerHTML = msg;
-	}
+	function report(msg) { document.getElementById('state').innerHTML = msg; }
 	
 	function getCurrMol() {
 		return Kekule.ChemStructureUtils.getTotalStructFragment(composer.getChemObj());
@@ -158,24 +143,23 @@
 				timeEnd = Date.now();
 				var elapse = (timeEnd - timeStart) / 1000;
 				viewer.setChemObj(generatedMol);
-				report('Ready - Done in ' + elapse + 's');
+				report('Ready - Computed in ' + elapse + 's');
 			},
 			function(err) {
 				btnGen.setEnabled(true);
 				btnTerminate.setEnabled(false);
-				report('Error occurred');
+				report('Calculation Error');
 			}
 		);
 	}
 
 	function terminate() {
-		report('Calculation halted');
+		report('User Terminated');
 		btnGen.setEnabled(true);
 		btnTerminate.setEnabled(false);
 		if (calculator) calculator.halt();
 	}
 
-	// 描画サイズをコンテナに強制フィットさせる
 	function syncSizes() {
 		if (composer) composer.notifyObjectSizeChanged();
 		if (viewer) viewer.notifyObjectSizeChanged();
@@ -188,10 +172,10 @@
 		var toolButtons = composer.getCommonToolButtons() || composer.getDefaultCommonToolBarButtons();
 		
 		toolButtons.push({
-			'id': 'btnGen', 'text': 'Generate 3D', 'hint': 'Generate 3D', 'showText': true, 'cssText': 'width:auto; color:#fff; background:#1a73e8;', '#execute': generate3D
+			'id': 'btnGen', 'text': 'Generate 3D', 'hint': 'Optimize to 3D', 'showText': true, 'cssText': 'width:auto; color:#fff; background:#1a73e8; font-weight:bold;', '#execute': generate3D
 		});
 		toolButtons.push({
-			'id': 'btnTerminate', 'text': 'Terminate', 'hint': 'Stop', 'showText': true, 'cssText': 'width:auto;', '#execute': terminate
+			'id': 'btnTerminate', 'text': 'Terminate', 'hint': 'Stop Calculation', 'showText': true, 'cssText': 'width:auto;', '#execute': terminate
 		});
 		
 		composer.setCommonToolButtons(toolButtons);
@@ -201,7 +185,7 @@
 		btnTerminate.setEnabled(false);
 
 		window.addEventListener('resize', syncSizes);
-		setTimeout(syncSizes, 200);
+		setTimeout(syncSizes, 300);
 	}
 	
 	Kekule.X.domReady(init);
@@ -210,25 +194,25 @@
 
 <body>
 	<header>
-		<h1>3D Structure Generator</h1>
+		<h1>Molecular 3D Generator</h1>
 		<div id="state">Ready</div>
 	</header>
 
 	<div class="main-container">
 		<div class="tool-section">
-			<div class="section-header">2D Structure Editor</div>
+			<div class="section-header">2D Editor</div>
 			<div id="composer" data-widget="Kekule.Editor.Composer" data-chem-obj="url(#molSrc)" data-predefined-setting="molOnly"></div>
 		</div>
 		
 		<div class="tool-section">
-			<div class="section-header">3D Molecular Viewer</div>
+			<div class="section-header">3D View</div>
 			<div id="chemViewer" data-widget="Kekule.ChemWidget.Viewer3D" data-predefined-setting="fullFunc" 
 				data-toolbar-evoke-modes="" data-toolbar-pos="1"></div>
 		</div>
 	</div>
 
 	<footer>
-		Draw molecules on the left, click <strong>"Generate 3D"</strong> to optimize. This tool runs entirely in your browser.
+		ブラウザ上で動作する分子構造計算ツールです。2Dで構造を描画し「Generate 3D」をクリックしてください。
 	</footer>
 </body>
 </html>
