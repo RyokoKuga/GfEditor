@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>GfEditer - Dual Mode Molecular Studio (Version 022)</title>
+<title>GfEditer - Dual Mode Molecular Studio (Version 023)</title>
 
 	<script src="../../libs/Three.js"></script>
 	<script src="../../libs/raphael-min.2.0.1.js"></script>
@@ -51,7 +51,7 @@
 
 		.header-btn {
 			padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
-			cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+			cursor: pointer; transition: all 0.25s;
 			border: 1px solid transparent;
 			display: inline-flex; align-items: center; gap: 5px;
 			white-space: nowrap;
@@ -64,10 +64,6 @@
 			background-color: var(--accent-red);
 			color: var(--white);
 			border-color: var(--accent-red);
-		}
-		#ext-btn-terminate:hover:not(:disabled) {
-			background-color: var(--accent-red-hover);
-			transform: translateY(-1px);
 		}
 		#ext-btn-terminate:disabled {
 			background-color: transparent;
@@ -98,10 +94,10 @@
 
 		#composer, #chemViewer { width: 100% !important; height: 100% !important; }
 
-		#gamess-config { padding: 40px; background: #fdfdfd; overflow-y: auto; }
-		.config-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 400px; }
-		.config-group label { font-size: 11px; font-weight: 700; color: #5f6368; text-transform: uppercase; }
-		.config-group select { padding: 10px; border-radius: 6px; border: 1px solid var(--app-border); font-size: 14px; width: 100%; }
+		#gamess-config { padding: 30px 40px; background: #fdfdfd; overflow-y: auto; }
+		.config-grid { display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 400px; }
+		.config-group label { font-size: 11px; font-weight: 700; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px; }
+		.config-group select { padding: 9px; border-radius: 6px; border: 1px solid var(--app-border); font-size: 13px; width: 100%; background-color: white; }
 
 		#gamess-editor {
 			flex: 1; border: none; padding: 20px;
@@ -118,7 +114,7 @@
 <body>
 	<header>
 		<div style="display:flex; align-items:center;">
-			<div class="logo"><span class="g-accent">G</span>fEditer</div>
+			<div class="logo"><span style="color:var(--accent-blue)">G</span>fEditer</div>
 			<div id="state">Editor Mode</div>
 		</div>
 		<div class="header-right">
@@ -130,6 +126,7 @@
 	</header>
 
 	<div class="app-container">
+		<!-- Modeling Pane -->
 		<div id="panel-modeling" class="mode-panel active">
 			<div id="pane-2d" class="tool-pane col-left">
 				<div id="composer" data-widget="Kekule.Editor.Composer" data-predefined-setting="molOnly"></div>
@@ -140,24 +137,58 @@
 			</div>
 		</div>
 
+		<!-- Editor (GAMESS) Pane -->
 		<div id="panel-gamess" class="mode-panel">
 			<div id="gamess-config" class="tool-pane col-left">
 				<h2 style="margin-top:0; font-size:18px; color:var(--accent-blue);">GAMESS Configuration</h2>
 				<div class="config-grid">
-					<div class="config-group"><label>Theory (SCFTYP)</label>
-						<select id="cfg-scf" onchange="updateGamessText()"><option value="RHF">RHF</option><option value="UHF">UHF</option><option value="ROHF">ROHF</option></select>
+					<div class="config-group">
+						<label>Theory</label>
+						<select id="cfg-theory" onchange="updateGamessText()">
+							<option value="RHF">RHF</option>
+							<option value="UHF">UHF</option>
+							<option value="DFT TYP=B3LYP">B3LYP (DFT)</option>
+							<option value="MP2">MP2</option>
+						</select>
 					</div>
-					<div class="config-group"><label>Run Type</label>
-						<select id="cfg-run" onchange="updateGamessText()"><option value="OPTIMIZE">OPTIMIZE</option><option value="ENERGY">ENERGY</option><option value="HESSIAN">HESSIAN</option></select>
+					<div class="config-group">
+						<label>Run Type</label>
+						<select id="cfg-run" onchange="updateGamessText()">
+							<option value="OPTIMIZE">OPTIMIZE</option>
+							<option value="ENERGY">ENERGY</option>
+							<option value="HESSIAN">HESSIAN</option>
+							<option value="SADPOINT">SADPOINT</option>
+						</select>
 					</div>
-					<div class="config-group"><label>Basis Set</label>
-						<select id="cfg-basis" onchange="updateGamessText()"><option value="N31">6-31G</option><option value="STO">STO-3G</option><option value="N21">3-21G</option></select>
+					<div class="config-group">
+						<label>Basis Set</label>
+						<select id="cfg-basis" onchange="updateGamessText()">
+							<option value="STO">STO-3G</option>
+							<option value="N21">3-21G</option>
+							<option value="N31">6-31G(d)</option>
+							<option value="N311">6-31G(d,p)</option>
+							<option value="N311G">6-31+G(d,p)</option>
+						</select>
 					</div>
-					<div class="config-group"><label>Charge</label>
-						<select id="cfg-charge" onchange="updateGamessText()"><option value="0">0</option><option value="1">+1</option><option value="-1">-1</option></select>
+					<div class="config-group">
+						<label>Charge</label>
+						<select id="cfg-charge" onchange="updateGamessText()">
+							<option value="-2">-2</option>
+							<option value="-1">-1</option>
+							<option value="0" selected>0 (Neutral)</option>
+							<option value="1">+1</option>
+							<option value="2">+2</option>
+						</select>
+					</div>
+					<div class="config-group">
+						<label>Multiplicity</label>
+						<select id="cfg-mult" onchange="updateGamessText()">
+							<option value="1">1 (Singlet)</option>
+							<option value="2">2 (Doublet)</option>
+							<option value="3">3 (Triplet)</option>
+						</select>
 					</div>
 				</div>
-				<!-- 英語表記に変更 -->
 				<p style="margin-top:30px; font-size:12px; color:#666;">* Coordinates will be automatically updated when you modify the molecule in the Modeling pane.</p>
 			</div>
 			<div class="resizer" id="resizer-gamess"></div>
@@ -204,14 +235,30 @@
 		var mol = viewer.getChemObj();
 		var editor = document.getElementById('gamess-editor');
 		if (!mol || mol.getNodeCount() === 0) {
-			// 英語表記に変更
 			editor.value = "! No 3D coordinates available.\n! Please execute 'Generate 3D' in the Modeling pane.";
 			return;
 		}
+
+		var theoryVal = document.getElementById('cfg-theory').value;
+		var run = document.getElementById('cfg-run').value;
+		var basis = document.getElementById('cfg-basis').value;
+		var charge = document.getElementById('cfg-charge').value;
+		var mult = document.getElementById('cfg-mult').value;
+
+		// TheoryがB3LYPの場合は $CONTRL への書き込み方を調整
+		var scftyp = (theoryVal.includes('B3LYP') || theoryVal === 'MP2') ? 'RHF' : theoryVal;
+		if (mult > 1 && scftyp === 'RHF') scftyp = 'ROHF'; // 閉殻でない場合の補正
+
 		var lines = [];
-		lines.push(` $CONTRL SCFTYP=${document.getElementById('cfg-scf').value} RUNTYP=${document.getElementById('cfg-run').value} ICHG=${document.getElementById('cfg-charge').value} COORD=UNIQUE $END`);
-		lines.push(` $BASIS  GBASIS=${document.getElementById('cfg-basis').value} $END`);
+		var contrlLine = ` $CONTRL SCFTYP=${scftyp} RUNTYP=${run} ICHG=${charge} MULT=${mult} COORD=UNIQUE`;
+		if (theoryVal.includes('B3LYP')) contrlLine += ` DFTTYP=B3LYP`;
+		if (theoryVal === 'MP2') contrlLine += ` MPLEVL=2`;
+		contrlLine += ` $END`;
+		
+		lines.push(contrlLine);
+		lines.push(` $BASIS  GBASIS=${basis} $END`);
 		lines.push(' $DATA\nGAMESS Input generated by GfEditer (2026)\nC1');
+
 		for (var i = 0; i < mol.getNodeCount(); ++i) {
 			var node = mol.getNodeAt(i);
 			if (node instanceof Kekule.Atom) {
