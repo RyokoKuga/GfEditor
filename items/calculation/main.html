@@ -2,7 +2,7 @@
 <html manifest_no_use="gen3D.manifest1">
 <head>
 <meta charset="utf-8">
-<title>3D Structure Generator Pro</title>
+<title>3D Structure Generator</title>
 
 	<script src="../../libs/Three.js"></script>
 	<script src="../../libs/raphael-min.2.0.1.js"></script>
@@ -10,10 +10,11 @@
 	<link rel="stylesheet" type="text/css" href="../../libs/kekule/themes/default/kekule.css" />
 	
 	<style>
+		/* レイアウトのみスタイリッシュに調整 */
 		body {
 			background-color: #0f172a;
 			color: #f8fafc;
-			font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+			font-family: sans-serif;
 			margin: 0;
 			display: flex;
 			flex-direction: column;
@@ -23,58 +24,43 @@
 
 		#state {
 			width: 100%;
+			height: 2em;
+			line-height: 2;
+			font-weight: bold;
 			text-align: center;
-			background: linear-gradient(90deg, #1e293b, #334155);
-			padding: 12px 0;
-			font-size: 0.9em;
+			background: #1e293b;
 			color: #38bdf8;
 			border-bottom: 1px solid #475569;
-			box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-			z-index: 10;
 		}
 
 		.main-content {
 			display: flex;
 			flex: 1;
 			flex-direction: row;
-			gap: 15px;
-			padding: 15px;
+			gap: 10px;
+			padding: 10px;
 			box-sizing: border-box;
-			align-items: stretch;
 		}
 
 		#composer, #chemViewer {
 			flex: 1;
-			min-width: 400px;
-			height: auto !important;
-			border-radius: 12px;
-			overflow: hidden;
-			box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+			height: auto !important; /* Flexboxに従う */
 			border: 1px solid #334155;
-			background: #1e293b;
+			border-radius: 8px;
+			overflow: hidden;
 		}
 
-		/* 3Dビューアのツールバーを常にハッキリ見せるためのCSS */
+		/* 3Dビューアのツールバーを常に表示させるための強制設定 */
 		.K-ChemWidget-Toolbar {
-			background: rgba(30, 41, 59, 0.9) !important;
 			opacity: 1 !important;
 			visibility: visible !important;
+			display: block !important;
 		}
 
 		#description {
-			padding: 10px 30px;
+			padding: 10px;
 			background: #1e293b;
-			border-top: 1px solid #334155;
-			font-size: 0.85em;
-			color: #94a3b8;
-		}
-
-		b { color: #38bdf8; }
-
-		@media (max-width: 900px) {
-			.main-content { flex-direction: column; overflow-y: auto; }
-			#composer, #chemViewer { min-height: 400px; flex: none; }
-			body { overflow: auto; }
+			font-size: 0.9em;
 		}
 	</style>
 
@@ -87,7 +73,7 @@
 	var calculator, timeStart, timeEnd;
 	
 	function report(stateText) {
-		document.getElementById('state').innerHTML = '● STATUS: ' + stateText;
+		document.getElementById('state').innerHTML = stateText;
 	}
 	
 	function getCurrMol() {
@@ -107,14 +93,14 @@
 		
 	function generate3D() {
 		var mol = getCurrMol();
-		report('Calculating 3D structure...');
+		report('Calculating...');
 		calcStart();
 		calculator = Kekule.Calculator.generate3D(mol, {'forceField': ''},
 			function(generatedMol){
 				calcEnd();
 				var elapse = (timeEnd - timeStart) / 1000;
 				viewer.setChemObj(generatedMol);
-				report('Calculation completed in ' + elapse + ' sec');
+				report('Calculation done in ' + elapse + ' sec');
 			},
 			function(err) {
 				if (err) {
@@ -126,7 +112,7 @@
 		);
 	}
 	function terminate() {
-		report('Process terminated by user');
+		report('Terminated by user');
 		calcEnd();
 		if (calculator) {
 			calculator.halt();			
@@ -139,33 +125,20 @@
 		
 		var toolButtons = composer.getCommonToolButtons() || composer.getDefaultCommonToolBarButtons();
 		
-		// ボタン配列の作成
-		var customButtons = [
-			{
-				'id': 'btnGen',
-				'text': 'Generate 3D', 
-				'hint': 'Optimize to 3D', 
-				'showText': true, 
-				'showGlyph': false, 
-				'cssText': 'width:auto; background:#0284c7 !important; color:white !important; font-weight:bold;',
-				'#execute': generate3D
-			},
-			{
-				'id': 'btnTerminate',
-				'text': 'Terminate', 
-				'hint': 'Stop calculation', 
-				'showText': true, 
-				'showGlyph': false, 
-				'cssText': 'width:auto; background:#991b1b !important; color:white !important;',
-				'#execute': terminate
-			}
-		];
+		// 元のコードと全く同じボタン定義をプッシュ
+		toolButtons.push({
+			'id': 'btnGen',
+			'text': 'Generate 3D', 'hint': 'Generate 3D structure', 'showText': true, 'showGlyph': false, 'cssText': 'width:auto',
+			'#execute': generate3D
+		});
+		toolButtons.push({
+			'id': 'btnTerminate',
+			'text': 'Terminate', 'hint': 'Terminate calculation', 'showText': true, 'showGlyph': false, 'cssText': 'width:auto',
+			'#execute': terminate
+		});
 		
-		// 既存のボタンに追加
-		toolButtons = toolButtons.concat(customButtons);
 		composer.setCommonToolButtons(toolButtons);
 		
-		// 変数への紐付け
 		btnGen = Kekule.Widget.getWidgetById('btnGen');
 		btnTerminate = Kekule.Widget.getWidgetById('btnTerminate');
 		btnTerminate.setEnabled(false);
@@ -177,19 +150,19 @@
 
 <body>
 
-	<div id="state">Ready</div>
+	<div id="state"></div>
 
 	<div class="main-content">
 		<div id="composer" data-widget="Kekule.Editor.Composer" data-chem-obj="url(#molSrc)" data-predefined-setting="molOnly"></div>
 		
-		<!-- 3Dビューア：data-toolbar-evoke-modes="[1]" で常に表示 -->
+		<!-- 3Dビューア：data-toolbar-evoke-modes="[0]" (常に表示) に設定 -->
 		<div id="chemViewer" data-widget="Kekule.ChemWidget.Viewer3D" data-predefined-setting="fullFunc" 
-			data-toolbar-evoke-modes="[1]"
-			data-toolbar-pos="1" data-toolbar-margin-horizontal="5" data-toolbar-margin-vertical="5"></div>
+			data-toolbar-evoke-modes="[0]"
+			data-toolbar-pos="1" data-toolbar-margin-horizontal="0" data-toolbar-margin-vertical="0"></div>
 	</div>
 
 	<div id="description">
-		<p><b>Instruction:</b> 2Dエディタ（左）で分子を編集し、<b>"Generate 3D"</b>をクリックすると3Dモデル（右）が更新されます。計算が重い場合は<b>"Terminate"</b>で停止できます。</p>
+		<p>Draw or load molecules in editors and click on "Generate 3D" button perform calculation of getting 3D structure. Press "Terminate" button to stop the calculation.</p>
 	</div>
 
 </body>
