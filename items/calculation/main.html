@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>GfEditer - 3D Molecular Studio with GAMESS Editor</title>
+<title>GfEditer - 3D Molecular Studio (Version 010)</title>
 
 	<script src="../../libs/Three.js"></script>
 	<script src="../../libs/raphael-min.2.0.1.js"></script>
@@ -73,23 +73,26 @@
 			min-height: 0;
 		}
 
-		/* 上部メインエリア */
-		.main-row { flex: 0 0 60%; display: flex; gap: 0; min-height: 0; }
-		/* 下部エディタエリア */
-		.editor-row { flex: 1; display: flex; gap: 0; min-height: 0; border-top: 1px solid var(--app-border); padding-top: 10px; }
+		/* 上下それぞれの行 */
+		.row { display: flex; gap: 0; min-height: 0; }
+		.main-row { flex: 3; } /* 3D表示を大きく確保 */
+		.editor-row { flex: 2; border-top: 1px solid var(--app-border); padding-top: 10px; }
 
 		.tool-section { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--app-border); border-radius: 10px; overflow: hidden; }
 		
-		#section-left-top { flex: 0 0 50%; }
-		#section-right-top { flex: 1; }
+		/* 左右の比率はJSで連動管理 */
+		.col-left { flex: 0 0 50%; }
+		.col-right { flex: 1; position: relative; }
 		
-		#section-left-bottom { flex: 0 0 50%; background: #fdfdfd; padding: 15px; overflow-y: auto; }
-		#section-right-bottom { flex: 1; position: relative; }
+		#section-left-bottom { background: #fdfdfd; padding: 15px; overflow-y: auto; }
 
 		.config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 		.config-group { display: flex; flex-direction: column; gap: 5px; }
 		.config-group label { font-size: 11px; font-weight: 700; color: #5f6368; }
 		.config-group select { padding: 6px; border-radius: 4px; border: 1px solid var(--app-border); font-size: 12px; }
+
+		/* ウィジェットを親要素いっぱいに広げる */
+		#composer, #chemViewer { width: 100% !important; height: 100% !important; display: block; }
 
 		#gamess-editor {
 			width: 100%; height: 100%; border: none; padding: 15px;
@@ -98,8 +101,10 @@
 			background: #202124; color: #e8eaed;
 		}
 
-		#resizer { width: 12px; cursor: col-resize; display: flex; align-items: center; justify-content: center; }
-		#resizer::after { content: ""; width: 2px; height: 30px; background: #ddd; }
+		/* リサイザーのデザインを一元化 */
+		.resizer-bar { width: 12px; cursor: col-resize; display: flex; align-items: center; justify-content: center; background: transparent; }
+		.resizer-bar::after { content: ""; width: 2px; height: 40px; background: #ddd; border-radius: 2px; }
+		.resizer-bar:hover::after { background: var(--accent-blue); }
 
 		footer { background: var(--app-header); padding: 0 24px; font-size: 11px; color: #70757a; border-top: 1px solid var(--app-border); height: 30px; display: flex; align-items: center; justify-content: flex-end; }
 	</style>
@@ -121,19 +126,19 @@
 
 	<div class="app-container">
 		<!-- 上段: 2D描画 & 3D表示 -->
-		<div class="main-row">
-			<div id="section-left-top" class="tool-section">
+		<div class="row main-row">
+			<div id="section-left-top" class="tool-section col-left">
 				<div id="composer" data-widget="Kekule.Editor.Composer" data-predefined-setting="molOnly"></div>
 			</div>
-			<div id="resizer"></div>
-			<div id="section-right-top" class="tool-section">
+			<div id="resizer-global" class="resizer-bar"></div>
+			<div id="section-right-top" class="tool-section col-right">
 				<div id="chemViewer" data-widget="Kekule.ChemWidget.Viewer3D" data-predefined-setting="fullFunc" data-toolbar-evoke-modes="" data-toolbar-pos="1"></div>
 			</div>
 		</div>
 
 		<!-- 下段: 設定パネル & リアルタイムエディタ -->
-		<div class="editor-row">
-			<div id="section-left-bottom" class="tool-section">
+		<div class="row editor-row">
+			<div id="section-left-bottom" class="tool-section col-left">
 				<div class="config-grid">
 					<div class="config-group"><label>Theory (SCFTYP)</label>
 						<select id="cfg-scf" onchange="updateGamessText()"><option value="RHF">RHF</option><option value="UHF">UHF</option><option value="ROHF">ROHF</option></select>
@@ -149,8 +154,8 @@
 					</div>
 				</div>
 			</div>
-			<div id="resizer-bottom" style="width:12px;"></div>
-			<div id="section-right-bottom" class="tool-section">
+			<div class="resizer-bar" style="cursor: default;"><!-- 下段の隙間確保用（ダミー） --></div>
+			<div id="section-right-bottom" class="tool-section col-right">
 				<textarea id="gamess-editor" spellcheck="false"></textarea>
 			</div>
 		</div>
@@ -174,7 +179,7 @@
 	function updateGamessText() {
 		var mol = viewer.getChemObj();
 		if (!mol || mol.getNodeCount() === 0) {
-			document.getElementById('gamess-editor').value = "! 3D構造を生成するとここに反映されます";
+			document.getElementById('gamess-editor').value = "! 3D構造を生成するとここに反映されます (2026 Edition)";
 			return;
 		}
 
@@ -213,6 +218,7 @@
 				viewer.setChemObj(generatedMol);
 				updateGamessText();
 				report('Ready (' + ((Date.now() - timeStart)/1000).toFixed(2) + 's)');
+				syncSizes(); // 生成後に再描画
 			},
 			function() { domBtnGen.disabled = false; domBtnTerminate.disabled = true; report('Ready'); }
 		);
@@ -246,26 +252,27 @@
 		domBtnTerminate = document.getElementById('ext-btn-terminate');
 		domBtnBabel = document.getElementById('ext-btn-babel');
 
-		// 左右リサイズ (上段)
-		const resizer = document.getElementById('resizer');
-		const leftSide = document.getElementById('section-left-top');
-		const leftSideBottom = document.getElementById('section-left-bottom');
+		const resizer = document.getElementById('resizer-global');
+		const leftCols = document.querySelectorAll('.col-left');
 		let isResizing = false;
 
-		resizer.addEventListener('mousedown', (e) => { isResizing = true; e.preventDefault(); });
+		resizer.addEventListener('mousedown', (e) => { isResizing = true; document.body.style.cursor = 'col-resize'; e.preventDefault(); });
 		window.addEventListener('mousemove', (e) => {
 			if (!isResizing) return;
 			const newWidth = (e.clientX / window.innerWidth) * 100;
 			if (newWidth > 15 && newWidth < 85) {
-				leftSide.style.flex = `0 0 ${newWidth}%`;
-				leftSideBottom.style.flex = `0 0 ${newWidth}%`; // 上下連動
+				leftCols.forEach(el => el.style.flex = `0 0 ${newWidth}%`);
 				syncSizes();
 			}
 		});
-		window.addEventListener('mouseup', () => { isResizing = false; });
+		window.addEventListener('mouseup', () => { isResizing = false; document.body.style.cursor = 'default'; });
 		window.addEventListener('resize', syncSizes);
-		setTimeout(syncSizes, 400);
-		updateGamessText();
+		
+		// 初期化後の描画確定
+		setTimeout(() => {
+			syncSizes();
+			updateGamessText();
+		}, 500);
 	}
 	Kekule.X.domReady(init);
 	</script>
