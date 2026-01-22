@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>GfEditer - 3D Molecular Studio (Version 010)</title>
+<title>GfEditer - 3D Molecular Studio (Version 011)</title>
 
 	<script src="../../libs/Three.js"></script>
 	<script src="../../libs/raphael-min.2.0.1.js"></script>
@@ -31,7 +31,7 @@
 			display: flex;
 			flex-direction: column;
 			height: 100vh;
-			overflow: hidden;
+			overflow: hidden; /* 全体は隠す */
 		}
 
 		header {
@@ -42,18 +42,17 @@
 			justify-content: space-between;
 			align-items: center;
 			height: 60px;
+			flex-shrink: 0;
 			z-index: 100;
 		}
 
-		.header-left { display: flex; align-items: center; gap: 20px; }
-		.header-right { display: flex; align-items: center; gap: 8px; }
 		.logo { font-size: 20px; font-weight: 700; }
 		.logo span.g-accent { color: var(--accent-blue); }
 
-		#state { font-size: 12px; color: #174ea6; background: #e8f0fe; padding: 5px 15px; border-radius: 20px; }
+		#state { font-size: 12px; color: #174ea6; background: #e8f0fe; padding: 5px 15px; border-radius: 20px; margin-left: 15px; }
 
 		.header-btn {
-			padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+			padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
 			cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
 			display: inline-flex; align-items: center; gap: 5px;
 		}
@@ -64,55 +63,83 @@
 		#ext-btn-babel.active { background: #e6f4ea; color: var(--accent-green); border-color: var(--accent-green); }
 		#ext-btn-download { background: var(--accent-orange); color: var(--white); }
 
+		/* スクロールを可能にするコンテナ */
 		.app-container {
 			flex: 1;
+			overflow-y: auto; /* 縦スクロールを有効化 */
 			display: flex;
 			flex-direction: column;
-			padding: 10px;
-			gap: 10px;
-			min-height: 0;
+			padding: 0;
 		}
 
-		/* 上下それぞれの行 */
-		.row { display: flex; gap: 0; min-height: 0; }
-		.main-row { flex: 3; } /* 3D表示を大きく確保 */
-		.editor-row { flex: 2; border-top: 1px solid var(--app-border); padding-top: 10px; }
+		/* 各セクションの高さ設定 */
+		.view-section {
+			display: flex;
+			width: 100%;
+			min-height: 85vh; /* メインエリアは大きく確保 */
+			flex-shrink: 0;
+			border-bottom: 1px solid var(--app-border);
+		}
 
-		.tool-section { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--app-border); border-radius: 10px; overflow: hidden; }
-		
-		/* 左右の比率はJSで連動管理 */
-		.col-left { flex: 0 0 50%; }
-		.col-right { flex: 1; position: relative; }
-		
-		#section-left-bottom { background: #fdfdfd; padding: 15px; overflow-y: auto; }
+		.editor-section {
+			display: flex;
+			width: 100%;
+			height: 500px; /* 下段エディタエリア */
+			flex-shrink: 0;
+			background: #fff;
+		}
 
-		.config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-		.config-group { display: flex; flex-direction: column; gap: 5px; }
-		.config-group label { font-size: 11px; font-weight: 700; color: #5f6368; }
-		.config-group select { padding: 6px; border-radius: 4px; border: 1px solid var(--app-border); font-size: 12px; }
+		.tool-column {
+			display: flex;
+			flex-direction: column;
+			position: relative;
+			overflow: hidden;
+		}
 
-		/* ウィジェットを親要素いっぱいに広げる */
-		#composer, #chemViewer { width: 100% !important; height: 100% !important; display: block; }
+		.col-left { flex: 0 0 50%; border-right: 1px solid transparent; }
+		.col-right { flex: 1; }
 
+		#composer, #chemViewer { width: 100% !important; height: 100% !important; }
+
+		/* 下段設定パネル */
+		#section-left-bottom { padding: 30px; background: #fdfdfd; border-right: 1px solid var(--app-border); }
+		.config-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 400px; }
+		.config-group { display: flex; flex-direction: column; gap: 8px; }
+		.config-group label { font-size: 12px; font-weight: 700; color: #5f6368; }
+		.config-group select { padding: 10px; border-radius: 6px; border: 1px solid var(--app-border); font-size: 14px; }
+
+		/* GAMESSテキストエディタ */
 		#gamess-editor {
-			width: 100%; height: 100%; border: none; padding: 15px;
-			box-sizing: border-box; font-family: 'Courier New', monospace;
-			font-size: 13px; line-height: 1.5; resize: none; outline: none;
-			background: #202124; color: #e8eaed;
+			width: 100%; height: 100%; border: none; padding: 20px;
+			box-sizing: border-box; font-family: 'Consolas', 'Monaco', monospace;
+			font-size: 14px; line-height: 1.6; resize: none; outline: none;
+			background: #1e1e1e; color: #d4d4d4;
 		}
 
-		/* リサイザーのデザインを一元化 */
-		.resizer-bar { width: 12px; cursor: col-resize; display: flex; align-items: center; justify-content: center; background: transparent; }
-		.resizer-bar::after { content: ""; width: 2px; height: 40px; background: #ddd; border-radius: 2px; }
-		.resizer-bar:hover::after { background: var(--accent-blue); }
+		/* 垂直リサイザー（1つの線で上下を貫く） */
+		#global-resizer {
+			width: 10px;
+			cursor: col-resize;
+			position: absolute;
+			left: 50%;
+			top: 0;
+			bottom: 0;
+			z-index: 1000;
+			background: transparent;
+			transform: translateX(-50%);
+		}
+		#global-resizer::after {
+			content: ""; position: absolute; left: 4px; top: 0; bottom: 0; width: 2px; background: var(--app-border);
+		}
+		#global-resizer:hover::after { background: var(--accent-blue); }
 
-		footer { background: var(--app-header); padding: 0 24px; font-size: 11px; color: #70757a; border-top: 1px solid var(--app-border); height: 30px; display: flex; align-items: center; justify-content: flex-end; }
+		footer { background: var(--app-header); padding: 0 24px; font-size: 11px; color: #70757a; border-top: 1px solid var(--app-border); height: 35px; display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; }
 	</style>
 </head>
 
 <body>
 	<header>
-		<div class="header-left">
+		<div style="display:flex; align-items:center;">
 			<div class="logo"><span class="g-accent">G</span>fEditer</div>
 			<div id="state">Ready</div>
 		</div>
@@ -124,38 +151,38 @@
 		</div>
 	</header>
 
-	<div class="app-container">
-		<!-- 上段: 2D描画 & 3D表示 -->
-		<div class="row main-row">
-			<div id="section-left-top" class="tool-section col-left">
+	<div class="app-container" id="scroll-container">
+		<!-- 上段: メインビュー (85vh) -->
+		<div class="view-section">
+			<div id="section-left-top" class="tool-column col-left">
 				<div id="composer" data-widget="Kekule.Editor.Composer" data-predefined-setting="molOnly"></div>
 			</div>
-			<div id="resizer-global" class="resizer-bar"></div>
-			<div id="section-right-top" class="tool-section col-right">
+			<div id="global-resizer"></div>
+			<div id="section-right-top" class="tool-column col-right">
 				<div id="chemViewer" data-widget="Kekule.ChemWidget.Viewer3D" data-predefined-setting="fullFunc" data-toolbar-evoke-modes="" data-toolbar-pos="1"></div>
 			</div>
 		</div>
 
-		<!-- 下段: 設定パネル & リアルタイムエディタ -->
-		<div class="row editor-row">
-			<div id="section-left-bottom" class="tool-section col-left">
+		<!-- 下段: GAMESS設定・エディタ -->
+		<div class="editor-section">
+			<div id="section-left-bottom" class="tool-column col-left">
+				<h3 style="margin-top:0; font-size:16px;">GAMESS Configuration</h3>
 				<div class="config-grid">
 					<div class="config-group"><label>Theory (SCFTYP)</label>
-						<select id="cfg-scf" onchange="updateGamessText()"><option value="RHF">RHF</option><option value="UHF">UHF</option><option value="ROHF">ROHF</option></select>
+						<select id="cfg-scf" onchange="updateGamessText()"><option value="RHF">RHF (Restricted)</option><option value="UHF">UHF (Unrestricted)</option><option value="ROHF">ROHF</option></select>
 					</div>
 					<div class="config-group"><label>Run Type</label>
-						<select id="cfg-run" onchange="updateGamessText()"><option value="OPTIMIZE">OPTIMIZE</option><option value="ENERGY">ENERGY</option><option value="HESSIAN">HESSIAN</option></select>
+						<select id="cfg-run" onchange="updateGamessText()"><option value="OPTIMIZE">Geometry Optimization</option><option value="ENERGY">Single Point Energy</option><option value="HESSIAN">Vibrational Analysis</option></select>
 					</div>
 					<div class="config-group"><label>Basis Set</label>
 						<select id="cfg-basis" onchange="updateGamessText()"><option value="N31">6-31G</option><option value="STO">STO-3G</option><option value="N21">3-21G</option></select>
 					</div>
 					<div class="config-group"><label>Charge</label>
-						<select id="cfg-charge" onchange="updateGamessText()"><option value="0">0</option><option value="1">+1</option><option value="-1">-1</option></select>
+						<select id="cfg-charge" onchange="updateGamessText()"><option value="0">0 (Neutral)</option><option value="1">+1</option><option value="-1">-1</option></select>
 					</div>
 				</div>
 			</div>
-			<div class="resizer-bar" style="cursor: default;"><!-- 下段の隙間確保用（ダミー） --></div>
-			<div id="section-right-bottom" class="tool-section col-right">
+			<div id="section-right-bottom" class="tool-column col-right">
 				<textarea id="gamess-editor" spellcheck="false"></textarea>
 			</div>
 		</div>
@@ -178,20 +205,16 @@
 
 	function updateGamessText() {
 		var mol = viewer.getChemObj();
+		var editor = document.getElementById('gamess-editor');
 		if (!mol || mol.getNodeCount() === 0) {
-			document.getElementById('gamess-editor').value = "! 3D構造を生成するとここに反映されます (2026 Edition)";
+			editor.value = "! 3D構造を生成するとここに反映されます\n! Generate 3D to see coordinates here.";
 			return;
 		}
 
-		var scf = document.getElementById('cfg-scf').value;
-		var run = document.getElementById('cfg-run').value;
-		var basis = document.getElementById('cfg-basis').value;
-		var charge = document.getElementById('cfg-charge').value;
-
 		var lines = [];
-		lines.push(` $CONTRL SCFTYP=${scf} RUNTYP=${run} ICHG=${charge} COORD=UNIQUE $END`);
-		lines.push(` $BASIS  GBASIS=${basis} $END`);
-		lines.push(' $DATA\nGenerated by GfEditer\nC1');
+		lines.push(` $CONTRL SCFTYP=${document.getElementById('cfg-scf').value} RUNTYP=${document.getElementById('cfg-run').value} ICHG=${document.getElementById('cfg-charge').value} COORD=UNIQUE $END`);
+		lines.push(` $BASIS  GBASIS=${document.getElementById('cfg-basis').value} $END`);
+		lines.push(' $DATA\nGAMESS Input by GfEditer (2026 Edition)\nC1');
 
 		for (var i = 0; i < mol.getNodeCount(); ++i) {
 			var node = mol.getNodeAt(i);
@@ -201,7 +224,7 @@
 			}
 		}
 		lines.push(' $END');
-		document.getElementById('gamess-editor').value = lines.join('\n');
+		editor.value = lines.join('\n');
 	}
 
 	function generate3D() {
@@ -218,22 +241,15 @@
 				viewer.setChemObj(generatedMol);
 				updateGamessText();
 				report('Ready (' + ((Date.now() - timeStart)/1000).toFixed(2) + 's)');
-				syncSizes(); // 生成後に再描画
 			},
 			function() { domBtnGen.disabled = false; domBtnTerminate.disabled = true; report('Ready'); }
 		);
 	}
 
-	function terminate() {
-		if (calculator) calculator.halt();
-		domBtnGen.disabled = false;
-		domBtnTerminate.disabled = true;
-		report('Terminated');
-	}
+	function terminate() { if (calculator) calculator.halt(); domBtnGen.disabled = false; domBtnTerminate.disabled = true; report('Terminated'); }
 
 	function downloadInp() {
-		var content = document.getElementById('gamess-editor').value;
-		var blob = new Blob([content], { type: 'text/plain' });
+		var blob = new Blob([document.getElementById('gamess-editor').value], { type: 'text/plain' });
 		var a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
 		a.download = 'gamess_input.inp';
@@ -252,7 +268,8 @@
 		domBtnTerminate = document.getElementById('ext-btn-terminate');
 		domBtnBabel = document.getElementById('ext-btn-babel');
 
-		const resizer = document.getElementById('resizer-global');
+		// 同期リサイザーロジック
+		const resizer = document.getElementById('global-resizer');
 		const leftCols = document.querySelectorAll('.col-left');
 		let isResizing = false;
 
@@ -262,17 +279,14 @@
 			const newWidth = (e.clientX / window.innerWidth) * 100;
 			if (newWidth > 15 && newWidth < 85) {
 				leftCols.forEach(el => el.style.flex = `0 0 ${newWidth}%`);
+				resizer.style.left = newWidth + '%';
 				syncSizes();
 			}
 		});
 		window.addEventListener('mouseup', () => { isResizing = false; document.body.style.cursor = 'default'; });
 		window.addEventListener('resize', syncSizes);
 		
-		// 初期化後の描画確定
-		setTimeout(() => {
-			syncSizes();
-			updateGamessText();
-		}, 500);
+		setTimeout(() => { syncSizes(); updateGamessText(); }, 500);
 	}
 	Kekule.X.domReady(init);
 	</script>
