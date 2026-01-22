@@ -44,7 +44,6 @@
 		}
 
 		.logo { font-size: 20px; font-weight: 700; }
-		.logo span.g-accent { color: var(--accent-blue); }
 		#state { font-size: 12px; color: #174ea6; background: #e8f0fe; padding: 5px 15px; border-radius: 20px; margin-left: 15px; }
 
 		.header-right { display: flex; align-items: center; gap: 8px; }
@@ -60,18 +59,8 @@
 		#ext-btn-gen { background: var(--accent-blue); color: var(--white); }
 		#ext-btn-gen:hover:not(:disabled) { background: var(--accent-blue-hover); transform: translateY(-1px); }
 
-		#ext-btn-terminate {
-			background-color: var(--accent-red);
-			color: var(--white);
-			border-color: var(--accent-red);
-		}
-		#ext-btn-terminate:disabled {
-			background-color: transparent;
-			color: #bdc1c6;
-			border-color: #e0e2e6;
-			opacity: 0.35;
-			cursor: default;
-		}
+		#ext-btn-terminate { background-color: var(--accent-red); color: var(--white); border-color: var(--accent-red); }
+		#ext-btn-terminate:disabled { background-color: transparent; color: #bdc1c6; border-color: #e0e2e6; opacity: 0.35; cursor: default; }
 
 		#ext-btn-babel { background: white; border-color: var(--app-border); color: #3c4043; }
 		#ext-btn-babel.active { background: #e6f4ea; color: #1e8e3e; border-color: #1e8e3e; }
@@ -126,7 +115,6 @@
 	</header>
 
 	<div class="app-container">
-		<!-- Modeling Pane -->
 		<div id="panel-modeling" class="mode-panel active">
 			<div id="pane-2d" class="tool-pane col-left">
 				<div id="composer" data-widget="Kekule.Editor.Composer" data-predefined-setting="molOnly"></div>
@@ -137,12 +125,10 @@
 			</div>
 		</div>
 
-		<!-- Editor (GAMESS) Pane -->
 		<div id="panel-gamess" class="mode-panel">
 			<div id="gamess-config" class="tool-pane col-left">
 				<h2 style="margin-top:0; font-size:18px; color:var(--accent-blue);">GAMESS Configuration</h2>
 				<div class="config-grid">
-					<!-- Run Type を先に配置 -->
 					<div class="config-group">
 						<label>Run Type</label>
 						<select id="cfg-run" onchange="updateGamessText()">
@@ -150,9 +136,9 @@
 							<option value="ENERGY">ENERGY</option>
 							<option value="HESSIAN">HESSIAN</option>
 							<option value="SADPOINT">SADPOINT</option>
+							<option value="IRC">IRC</option>
 						</select>
 					</div>
-					<!-- Theory を後に配置 -->
 					<div class="config-group">
 						<label>Theory</label>
 						<select id="cfg-theory" onchange="updateGamessText()">
@@ -167,9 +153,10 @@
 						<select id="cfg-basis" onchange="updateGamessText()">
 							<option value="STO">STO-3G</option>
 							<option value="N21">3-21G</option>
-							<option value="N31">6-31G(d)</option>
-							<option value="N311">6-31G(d,p)</option>
-							<option value="N311G">6-31+G(d,p)</option>
+							<option value="N31">6-31G</option>
+							<option value="N31-D">6-31G(d)</option>
+							<option value="N31-DP">6-31G(d,p)</option>
+							<option value="N31-DP-DIFF">6-31+G(d,p)</option>
 						</select>
 					</div>
 					<div class="config-group">
@@ -191,7 +178,6 @@
 						</select>
 					</div>
 				</div>
-				<p style="margin-top:30px; font-size:12px; color:#666;">* Coordinates will be automatically updated when you modify the molecule in the Modeling pane.</p>
 			</div>
 			<div class="resizer" id="resizer-gamess"></div>
 			<div id="pane-editor" class="tool-pane col-right" style="display:flex; flex-direction:column;">
@@ -215,7 +201,6 @@
 		const panelModeling = document.getElementById('panel-modeling');
 		const panelGamess = document.getElementById('panel-gamess');
 		domBtnSwitch = document.getElementById('ext-btn-switch');
-
 		if (currentMode === 'modeling') {
 			currentMode = 'gamess';
 			panelModeling.classList.remove('active');
@@ -243,7 +228,7 @@
 
 		var theoryVal = document.getElementById('cfg-theory').value;
 		var run = document.getElementById('cfg-run').value;
-		var basis = document.getElementById('cfg-basis').value;
+		var basisVal = document.getElementById('cfg-basis').value;
 		var charge = document.getElementById('cfg-charge').value;
 		var mult = document.getElementById('cfg-mult').value;
 
@@ -251,13 +236,41 @@
 		if (mult > 1 && scftyp === 'RHF') scftyp = 'ROHF'; 
 
 		var lines = [];
-		var contrlLine = ` $CONTRL SCFTYP=${scftyp} RUNTYP=${run} ICHARG=${charge} MULT=${mult} COORD=UNIQUE`;
-		if (theoryVal.includes('B3LYP')) contrlLine += ` DFTTYP=B3LYP`;
-		if (theoryVal === 'MP2') contrlLine += ` MPLEVL=2`;
-		contrlLine += ` $END`;
-		
-		lines.push(contrlLine);
-		lines.push(` $BASIS  GBASIS=${basis} $END`);
+		// $CONTRL (Charge=0の時はICHARGを省く)
+		var contrl = ` $CONTRL SCFTYP=${scftyp} RUNTYP=${run}`;
+		if (charge !== "0") contrl += ` ICHARG=${charge}`;
+		contrl += ` MULT=${mult}`;
+		if (theoryVal.includes('B3LYP')) contrl += ` DFTTYP=B3LYP`;
+		if (theoryVal === 'MP2') contrl += ` MPLEVL=2`;
+		contrl += ` $END`;
+		lines.push(contrl);
+
+		// $BASIS
+		var basisLine = "";
+		switch(basisVal) {
+			case 'STO': basisLine = " $BASIS GBASIS=STO NGAUSS=3 $END"; break;
+			case 'N21': basisLine = " $BASIS GBASIS=N21 NGAUSS=3 $END"; break;
+			case 'N31': basisLine = " $BASIS GBASIS=N31 NGAUSS=6 $END"; break;
+			case 'N31-D': basisLine = " $BASIS GBASIS=N31 NGAUSS=6 NDFUNC=1 $END"; break;
+			case 'N31-DP': basisLine = " $BASIS GBASIS=N31 NGAUSS=6 NDFUNC=1 NPFUNC=1 $END"; break;
+			case 'N31-DP-DIFF': basisLine = " $BASIS GBASIS=N31 NGAUSS=6 NDFUNC=1 NPFUNC=1 DIFFSP=.TRUE. $END"; break;
+		}
+		lines.push(basisLine);
+
+		// 各種追加オプション
+		if (run === 'HESSIAN' || run === 'SADPOINT') {
+			lines.push(" $FORCE METHOD=ANALYTIC VIBANL=.TRUE. $END");
+		}
+		if (run === 'IRC') {
+			lines.push(" $IRC SADDLE=.TRUE. FORWRD=.TRUE. NPOINT=100 STRIDE=0.1 $END");
+		}
+		if (run === 'OPTIMIZE') {
+			lines.push(" $STATPT OPTTOL=0.0001 NSTEP=100 HSSEND=.TRUE. $END");
+		}
+		if (run === 'SADPOINT') {
+			lines.push(" $STATPT OPTTOL=0.0001 NSTEP=100 HESS=CALC HSSEND=.TRUE. $END");
+		}
+
 		lines.push(' $DATA\nGAMESS Input generated by GfEditer (2026)\nC1');
 
 		for (var i = 0; i < mol.getNodeCount(); ++i) {
@@ -289,7 +302,6 @@
 	}
 
 	function terminate() { if (calculator) calculator.halt(); domBtnGen.disabled = false; domBtnTerminate.disabled = true; report('Terminated'); }
-
 	function downloadInp() {
 		var blob = new Blob([document.getElementById('gamess-editor').value], { type: 'text/plain' });
 		var a = document.createElement('a');
@@ -297,19 +309,8 @@
 		a.download = 'gamess_input.inp';
 		a.click();
 	}
-
-	function enableOpenBabel() {
-		Kekule.IO.enableOpenBabelFormats();
-		var btn = document.getElementById('ext-btn-babel');
-		btn.classList.add('active');
-		btn.innerHTML = '✓ OpenBabel Enabled';
-		report('OpenBabel Enabled');
-	}
-
-	function syncSizes() {
-		if (composer) composer.notifyObjectSizeChanged();
-		if (viewer) viewer.notifyObjectSizeChanged();
-	}
+	function enableOpenBabel() { Kekule.IO.enableOpenBabelFormats(); var btn = document.getElementById('ext-btn-babel'); btn.classList.add('active'); btn.innerHTML = '✓ OpenBabel Enabled'; report('OpenBabel Enabled'); }
+	function syncSizes() { if (composer) composer.notifyObjectSizeChanged(); if (viewer) viewer.notifyObjectSizeChanged(); }
 
 	function init() {
 		viewer = Kekule.Widget.getWidgetById('chemViewer');
@@ -325,21 +326,15 @@
 			window.addEventListener('mousemove', (e) => {
 				if (!isResizing) return;
 				const newWidth = (e.clientX / window.innerWidth) * 100;
-				if (newWidth > 15 && newWidth < 85) {
-					leftCol.style.flex = `0 0 ${newWidth}%`;
-					syncSizes();
-				}
+				if (newWidth > 15 && newWidth < 85) { leftCol.style.flex = `0 0 ${newWidth}%`; syncSizes(); }
 			});
 			window.addEventListener('mouseup', () => { isResizing = false; });
 		};
-
 		setupResizer('resizer-modeling', 'panel-modeling');
 		setupResizer('resizer-gamess', 'panel-gamess');
-
 		window.addEventListener('resize', syncSizes);
 		setTimeout(syncSizes, 500);
 	}
-
 	Kekule.X.domReady(init);
 	</script>
 </body>
