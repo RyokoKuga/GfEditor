@@ -76,7 +76,11 @@
 		.mode-panel.active { display: flex; }
 
 		.tool-pane { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--app-border); border-radius: 10px; overflow: hidden; }
-		.col-left { flex: 0 0 50%; }
+		
+		/* Modeling Paneは50/50、Gamess Paneは35/65の初期幅に設定 */
+		#panel-modeling .col-left { flex: 0 0 50%; }
+		#panel-gamess .col-left { flex: 0 0 35%; }
+
 		.col-right { flex: 1; position: relative; }
 		.resizer { width: 10px; cursor: col-resize; display: flex; align-items: center; justify-content: center; z-index: 10; }
 		.resizer::after { content: ""; width: 2px; height: 40px; background: #ddd; border-radius: 2px; }
@@ -116,6 +120,7 @@
 	</header>
 
 	<div class="app-container">
+		<!-- Modeling Pane -->
 		<div id="panel-modeling" class="mode-panel active">
 			<div id="pane-2d" class="tool-pane col-left">
 				<div id="composer" data-widget="Kekule.Editor.Composer" data-predefined-setting="molOnly"></div>
@@ -126,6 +131,7 @@
 			</div>
 		</div>
 
+		<!-- Editor (GAMESS) Pane -->
 		<div id="panel-gamess" class="mode-panel">
 			<div id="gamess-config" class="tool-pane col-left">
 				<h2 style="margin-top:0; font-size:18px; color:var(--accent-blue);">GAMESS Configuration</h2>
@@ -342,7 +348,7 @@
 		setupResizer('resizer-modeling', 'panel-modeling');
 		setupResizer('resizer-gamess', 'panel-gamess');
 
-		// 重要：エディタ上でのクリックやキー操作がリサイズイベントに吸われないようにする
+		// エディタ上でのクリックやキー操作がイベントに吸われないようにする
 		editor.addEventListener('mousedown', function(e) { e.stopPropagation(); });
 		editor.addEventListener('keydown', function(e) { e.stopPropagation(); });
 
