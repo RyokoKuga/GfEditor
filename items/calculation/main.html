@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>GfEditer - Dual Mode Molecular Studio (Version 020)</title>
+<title>GfEditer - Dual Mode Molecular Studio (Version 021)</title>
 
 	<script src="../../libs/Three.js"></script>
 	<script src="../../libs/raphael-min.2.0.1.js"></script>
@@ -47,18 +47,21 @@
 		.logo span.g-accent { color: var(--accent-blue); }
 		#state { font-size: 12px; color: #174ea6; background: #e8f0fe; padding: 5px 15px; border-radius: 20px; margin-left: 15px; }
 
+		.header-right { display: flex; align-items: center; gap: 8px; }
+
 		.header-btn {
 			padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
 			cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 			border: 1px solid transparent;
 			display: inline-flex; align-items: center; gap: 5px;
+			white-space: nowrap;
 		}
 
 		/* Generate 3D (青) */
 		#ext-btn-gen { background: var(--accent-blue); color: var(--white); }
 		#ext-btn-gen:hover:not(:disabled) { background: var(--accent-blue-hover); transform: translateY(-1px); }
 
-		/* Terminate (赤 - 以前のエフェクトを復元) */
+		/* Terminate (赤) */
 		#ext-btn-terminate {
 			background-color: var(--accent-red);
 			color: var(--white);
@@ -72,13 +75,16 @@
 			background-color: transparent;
 			color: #bdc1c6;
 			border-color: #e0e2e6;
-			opacity: 0.35; /* 非アクティブ時に薄くする */
+			opacity: 0.35;
 			cursor: default;
-			transform: none;
 		}
 
-		#ext-btn-switch { background: #3c4043; color: var(--white); }
-		#ext-btn-babel { background: white; border-color: var(--app-border); }
+		/* Enable OpenBabel (白/緑) */
+		#ext-btn-babel { background: white; border-color: var(--app-border); color: #3c4043; }
+		#ext-btn-babel.active { background: #e6f4ea; color: #1e8e3e; border-color: #1e8e3e; }
+
+		/* Switch Mode (黒) */
+		#ext-btn-switch { background: #3c4043; color: var(--white); margin-left: 4px; }
 
 		.app-container { flex: 1; position: relative; min-height: 0; }
 
@@ -120,15 +126,14 @@
 			<div id="state">Editor Mode</div>
 		</div>
 		<div class="header-right">
-			<button id="ext-btn-babel" class="header-btn" onclick="enableOpenBabel()">Enable OpenBabel</button>
 			<button id="ext-btn-gen" class="header-btn" onclick="generate3D()">Generate 3D</button>
 			<button id="ext-btn-terminate" class="header-btn" onclick="terminate()" disabled>Terminate</button>
+			<button id="ext-btn-babel" class="header-btn" onclick="enableOpenBabel()">Enable OpenBabel</button>
 			<button id="ext-btn-switch" class="header-btn" onclick="toggleMode()">Switch to Editor Mode</button>
 		</div>
 	</header>
 
 	<div class="app-container">
-		<!-- Modeling Pane -->
 		<div id="panel-modeling" class="mode-panel active">
 			<div id="pane-2d" class="tool-pane col-left">
 				<div id="composer" data-widget="Kekule.Editor.Composer" data-predefined-setting="molOnly"></div>
@@ -139,7 +144,6 @@
 			</div>
 		</div>
 
-		<!-- Editor (GAMESS) Pane -->
 		<div id="panel-gamess" class="mode-panel">
 			<div id="gamess-config" class="tool-pane col-left">
 				<h2 style="margin-top:0; font-size:18px; color:var(--accent-blue);">GAMESS Configuration</h2>
@@ -250,7 +254,9 @@
 
 	function enableOpenBabel() {
 		Kekule.IO.enableOpenBabelFormats();
-		document.getElementById('ext-btn-babel').style.background = "#e6f4ea";
+		var btn = document.getElementById('ext-btn-babel');
+		btn.classList.add('active');
+		btn.innerHTML = '✓ OpenBabel Enabled';
 		report('OpenBabel Enabled');
 	}
 
