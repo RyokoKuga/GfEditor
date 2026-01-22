@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>GfEditer - Dual Mode Molecular Studio (Version 019)</title>
+<title>GfEditer - Dual Mode Molecular Studio (Version 020)</title>
 
 	<script src="../../libs/Three.js"></script>
 	<script src="../../libs/raphael-min.2.0.1.js"></script>
@@ -15,7 +15,9 @@
 			--app-header: #ffffff;
 			--app-border: #e0e2e6;
 			--accent-blue: #1a73e8;
+			--accent-blue-hover: #1765cc;
 			--accent-red: #d93025;
+			--accent-red-hover: #b31412;
 			--accent-orange: #f29900;
 			--white: #ffffff;
 		}
@@ -46,12 +48,35 @@
 		#state { font-size: 12px; color: #174ea6; background: #e8f0fe; padding: 5px 15px; border-radius: 20px; margin-left: 15px; }
 
 		.header-btn {
-			padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
-			cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+			padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
+			cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+			border: 1px solid transparent;
 			display: inline-flex; align-items: center; gap: 5px;
 		}
+
+		/* Generate 3D (青) */
 		#ext-btn-gen { background: var(--accent-blue); color: var(--white); }
-		#ext-btn-terminate { background: var(--accent-red); color: var(--white); }
+		#ext-btn-gen:hover:not(:disabled) { background: var(--accent-blue-hover); transform: translateY(-1px); }
+
+		/* Terminate (赤 - 以前のエフェクトを復元) */
+		#ext-btn-terminate {
+			background-color: var(--accent-red);
+			color: var(--white);
+			border-color: var(--accent-red);
+		}
+		#ext-btn-terminate:hover:not(:disabled) {
+			background-color: var(--accent-red-hover);
+			transform: translateY(-1px);
+		}
+		#ext-btn-terminate:disabled {
+			background-color: transparent;
+			color: #bdc1c6;
+			border-color: #e0e2e6;
+			opacity: 0.35; /* 非アクティブ時に薄くする */
+			cursor: default;
+			transform: none;
+		}
+
 		#ext-btn-switch { background: #3c4043; color: var(--white); }
 		#ext-btn-babel { background: white; border-color: var(--app-border); }
 
@@ -92,19 +117,18 @@
 	<header>
 		<div style="display:flex; align-items:center;">
 			<div class="logo"><span class="g-accent">G</span>fEditer</div>
-			<!-- 初期ステータスを Editor Mode に変更 -->
 			<div id="state">Editor Mode</div>
 		</div>
 		<div class="header-right">
 			<button id="ext-btn-babel" class="header-btn" onclick="enableOpenBabel()">Enable OpenBabel</button>
 			<button id="ext-btn-gen" class="header-btn" onclick="generate3D()">Generate 3D</button>
 			<button id="ext-btn-terminate" class="header-btn" onclick="terminate()" disabled>Terminate</button>
-			<!-- ボタン名を Switch to Editor Mode に変更 -->
 			<button id="ext-btn-switch" class="header-btn" onclick="toggleMode()">Switch to Editor Mode</button>
 		</div>
 	</header>
 
 	<div class="app-container">
+		<!-- Modeling Pane -->
 		<div id="panel-modeling" class="mode-panel active">
 			<div id="pane-2d" class="tool-pane col-left">
 				<div id="composer" data-widget="Kekule.Editor.Composer" data-predefined-setting="molOnly"></div>
@@ -115,6 +139,7 @@
 			</div>
 		</div>
 
+		<!-- Editor (GAMESS) Pane -->
 		<div id="panel-gamess" class="mode-panel">
 			<div id="gamess-config" class="tool-pane col-left">
 				<h2 style="margin-top:0; font-size:18px; color:var(--accent-blue);">GAMESS Configuration</h2>
@@ -162,7 +187,7 @@
 			panelModeling.classList.remove('active');
 			panelGamess.classList.add('active');
 			domBtnSwitch.innerHTML = 'Switch to Modeling Mode';
-			report('Editor Mode'); // 切り替え後のステータス
+			report('Editor Mode');
 			updateGamessText();
 		} else {
 			currentMode = 'modeling';
@@ -178,7 +203,7 @@
 		var mol = viewer.getChemObj();
 		var editor = document.getElementById('gamess-editor');
 		if (!mol || mol.getNodeCount() === 0) {
-			editor.value = "! 3D座標がありません。Modeling画面でGenerate 3Dを実行してください。";
+			editor.value = "! 3D座標がありません。ModelingペインでGenerate 3Dを実行してください。";
 			return;
 		}
 		var lines = [];
