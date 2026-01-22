@@ -1,8 +1,6 @@
-# 🧪 GfEditer - Dual Mode Molecular Studio
+# 🧪 GfEditer - Dual Mode Molecular Editer
 
-![Version](https://img.shields.io)
-![License](https://img.shields.io)
-![Platform](https://img.shields.io)
+
 
 **GfEditer** は、Webブラウザ上で分子構造のモデリングから、量子化学計算ソフト **GAMESS** 用の入力ファイル（`.inp`）生成までをシームレスに行うための高機能支援ツールです。
 
@@ -12,10 +10,10 @@
 
 | 機能 | 詳細 |
 | :--- | :--- |
-| 🔄 **Dual Mode** | 構造を作る **Modeling** と、計算設定を行う **Editor** を瞬時に切替 |
-| ⚡ **Real-time Sync** | 構造の変更を即座に感知し、XYZ座標を自動更新。入力ミスを排除 |
-| ⚛️ **3D Optimizer** | 2DスケッチからMMFF94力場を用いた精度の高い初期3D構造を生成 |
-| 📑 **Smart Formatting** | 2026年基準の正確なカラム整列とGAMESS専用キーワードに対応 |
+| 🔄 **Dual Mode** | 構造を作る **Modeling** と、計算設定を行う **Editor** を瞬時に切替。 |
+| ⚡ **Real-time Sync** | 構造の変更を即座に感知し、XYZ座標を自動更新。入力ミスを排除。 |
+| ⚛️ **3D Optimizer** | 2DスケッチからMMFF94力場を用いた精度の高い初期3D構造を生成。 |
+| 📑 **Smart Formatting** | GAMESS 標準に基づいて正確な列配置で座標を出力します。 |
 
 ---
 
@@ -47,9 +45,9 @@
 ## 📦 使用ライブラリ
 
 本プロジェクトは以下のオープンソースライブラリにより動作しています。
-*   [Kekule.js](https://partridge16.github.io) - 分子操作エンジン
+*   [Kekule.js](https://github.com/partridgejiang/Kekule.js) - 分子操作エンジン
 *   [Three.js](https://threejs.org) - 3Dレンダリング
-*   [Raphael.js](http://dmitrybaranovskiy.github.io) - 2Dグラフィックス
+*   [Raphael.js](https://github.com/DmitryBaranovskiy/raphael) - 2Dグラフィックス
 
 ---
 
