@@ -78,7 +78,7 @@
 		.tool-pane { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--app-border); border-radius: 10px; overflow: hidden; }
 		.col-left { flex: 0 0 50%; }
 		.col-right { flex: 1; position: relative; }
-		.resizer { width: 10px; cursor: col-resize; display: flex; align-items: center; justify-content: center; }
+		.resizer { width: 10px; cursor: col-resize; display: flex; align-items: center; justify-content: center; z-index: 10; }
 		.resizer::after { content: ""; width: 2px; height: 40px; background: #ddd; border-radius: 2px; }
 
 		#composer, #chemViewer { width: 100% !important; height: 100% !important; }
@@ -90,8 +90,9 @@
 
 		#gamess-editor {
 			flex: 1; border: none; padding: 20px;
-			font-family: 'Consolas', monospace; font-size: 14px; line-height: 1.6;
+			font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; line-height: 1.6;
 			background: #1e1e1e; color: #d4d4d4; outline: none; resize: none;
+			-webkit-user-select: text; user-select: text;
 		}
 		.editor-footer { padding: 10px 20px; background: #2d2d2d; display: flex; justify-content: flex-end; }
 		#ext-btn-download { background: var(--accent-orange); color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; }
@@ -236,7 +237,6 @@
 		if (mult > 1 && scftyp === 'RHF') scftyp = 'ROHF'; 
 
 		var lines = [];
-		// $CONTRL (Charge=0の時はICHARGを省く)
 		var contrl = ` $CONTRL SCFTYP=${scftyp} RUNTYP=${run}`;
 		if (charge !== "0") contrl += ` ICHARG=${charge}`;
 		contrl += ` MULT=${mult}`;
@@ -245,7 +245,6 @@
 		contrl += ` $END`;
 		lines.push(contrl);
 
-		// $BASIS
 		var basisLine = "";
 		switch(basisVal) {
 			case 'STO': basisLine = " $BASIS GBASIS=STO NGAUSS=3 $END"; break;
@@ -257,7 +256,6 @@
 		}
 		lines.push(basisLine);
 
-		// 各種追加オプション
 		if (run === 'HESSIAN' || run === 'SADPOINT') {
 			lines.push(" $FORCE METHOD=ANALYTIC VIBANL=.TRUE. $END");
 		}
@@ -317,21 +315,37 @@
 		composer = Kekule.Widget.getWidgetById('composer');
 		domBtnGen = document.getElementById('ext-btn-gen');
 		domBtnTerminate = document.getElementById('ext-btn-terminate');
+		var editor = document.getElementById('gamess-editor');
 
 		const setupResizer = (resizerId, panelId) => {
 			const resizer = document.getElementById(resizerId);
 			const leftCol = document.querySelector(`#${panelId} .col-left`);
 			let isResizing = false;
-			resizer.addEventListener('mousedown', (e) => { isResizing = true; e.preventDefault(); });
+
+			resizer.addEventListener('mousedown', (e) => { 
+				isResizing = true; 
+				document.body.style.cursor = 'col-resize';
+			});
+
 			window.addEventListener('mousemove', (e) => {
 				if (!isResizing) return;
 				const newWidth = (e.clientX / window.innerWidth) * 100;
 				if (newWidth > 15 && newWidth < 85) { leftCol.style.flex = `0 0 ${newWidth}%`; syncSizes(); }
 			});
-			window.addEventListener('mouseup', () => { isResizing = false; });
+
+			window.addEventListener('mouseup', () => { 
+				isResizing = false; 
+				document.body.style.cursor = 'default';
+			});
 		};
+
 		setupResizer('resizer-modeling', 'panel-modeling');
 		setupResizer('resizer-gamess', 'panel-gamess');
+
+		// 重要：エディタ上でのクリックやキー操作がリサイズイベントに吸われないようにする
+		editor.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+		editor.addEventListener('keydown', function(e) { e.stopPropagation(); });
+
 		window.addEventListener('resize', syncSizes);
 		setTimeout(syncSizes, 500);
 	}
