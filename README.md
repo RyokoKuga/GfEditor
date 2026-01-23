@@ -1,5 +1,6 @@
 # GfEditor - Dual Mode Molecular Editor
 
+[https://pc-chem-basics.blog.jp/archives/38048019.html](https://pc-chem-basics.blog.jp/archives/38048019.html)
 
 **GfEditor** is a web-based support tool designed to seamlessly bridge the gap between molecular modeling and the generation of input files (`.inp`) for the quantum chemistry software **GAMESS**.
 
