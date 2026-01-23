@@ -7,7 +7,7 @@
 
 ## 🚀 How to Use
 
-1. **Draw**: Sketch the molecule and click the `Generate 3D` button to obtain 3D coordinates.
+1. **Draw**: Sketch the molecule and click the `Generate 3D` button to obtain 3D coordinates(by MMFF94).
 2. **Configure**: Click the `Switch to Editor Mode` button to select the calculation method and basis set.
 3. **Download**: Review the generated content and click the `Download .inp File` button to save your input file.
 
