@@ -8,8 +8,8 @@ README in [English](https://github.com/RyokoKuga/GfEditor/blob/main/README.md)
 
 ## 🚀 使い方
 
-1.  **Draw**: Modeling Modeで分子を描き、`Generate 3D` ボタンをクリックして3D座標を得ます。
-2.  **Configure**: `Switch to Editor Mode` ボタンをクリックして、Editor Modeで計算手法や基底関数を選択します。
+1.  **Draw**: 分子を描き、`Generate 3D` ボタンをクリックして3D座標を得ます。
+2.  **Configure**: `Switch to Editor Mode` ボタンをクリックして、計算手法や基底関数を選択します。
 3.  **Download**: 生成された内容を確認し、`Download .inp File` ボタンでファイルを保存します。
 
 `Enable OpenBabel` ボタンをクリックすることで、対応するファイルフォーマットを増やすことができます。
