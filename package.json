@@ -1,7 +1,7 @@
 {
   "name": "GfEditor",
   "version": "1.0.0",
-  "description": "GfEditor Desktop App",
+  "description": "GfEditor for Windows",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -9,14 +9,24 @@
   },
   "build": {
     "appId": "io.github.ryokokuga.gfeditor",
-    "mac": {
+    "productName": "GfEditor",
+    "win": {
       "icon": "icon.png",
       "target": [
-        "dmg"
-      ],
-      "extendInfo": {
-        "LSMinimumSystemVersion": "10.13.0"
-      }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "GfEditor"
     },
     "directories": {
       "output": "dist"
