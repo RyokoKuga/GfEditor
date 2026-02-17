@@ -1,0 +1,30 @@
+name: Build Mac App
+on:
+  push:
+    tags:
+      - 'v*' # v1.0.0 のようなタグを付けた時だけ実行
+
+jobs:
+  build:
+    runs-on: macos-latest # Macのサーバーで実行
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Mac App
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release App
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.dmg  # ビルドされた.dmgファイルを配布
