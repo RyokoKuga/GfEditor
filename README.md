@@ -1,12 +1,13 @@
 # GfEditor - Dual Mode Molecular Editor
+**GfEditor** is a web-based support tool designed to seamlessly bridge the gap between molecular modeling and the generation of input files (`.inp`) for the quantum chemistry software **GAMESS**.  
+
+<img src="Image/Card.png" width="600px">  
 
 [https://pc-chem-basics.blog.jp/archives/38048019.html](https://pc-chem-basics.blog.jp/archives/38048019.html)
 
-**GfEditor** is a web-based support tool designed to seamlessly bridge the gap between molecular modeling and the generation of input files (`.inp`) for the quantum chemistry software **GAMESS**.
-
 ---
 
-## 🚀 How to Use
+## ■ How to Use
 
 1. **Draw**: Sketch the molecule and click the `Generate 3D` button to obtain 3D coordinates(by MMFF94).
 2. **Configure**: Click the `Switch to Editor Mode` button to select the calculation method and basis set.
@@ -14,7 +15,7 @@
 
 ---
 
-## 📦 Libraries Used
+## ■ Libraries Used
 
 This project is powered by the following open-source libraries:
 *   [Kekule.js](https://github.com/partridgejiang/Kekule.js) - Molecular structure drawing
@@ -24,7 +25,7 @@ This project is powered by the following open-source libraries:
 
 ---
 
-## 📄 License
+## ■ License
 
 Copyright © 2026 GfEditor Project.
 Licensed under the [MIT License](LICENSE).
