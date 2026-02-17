@@ -1,12 +1,12 @@
-name: Build Mac App
+name: Build Mac App (Universal)
 on:
   push:
-    tags:
-      - 'v*' # v1.0.0 のようなタグを付けた時だけ実行
+    branches: [ "main" ] # mainブランチにpushされたら自動実行
+  workflow_dispatch:      # 手動で実行ボタンを押すことも可能にする
 
 jobs:
   build:
-    runs-on: macos-latest # Macのサーバーで実行
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -15,16 +15,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm' # キャッシュを使って2回目以降を高速化
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build Mac App
-        run: npm run build
+      - name: Build Mac App (Universal)
+        # --universalフラグでIntel/Appleシリコン両対応
+        run: npx electron-builder --mac --universal
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Release App
-        uses: softprops/action-gh-release@v1
+      - name: Upload Artifact
+        uses: actions/upload-artifacts@v4
         with:
-          files: dist/*.dmg  # ビルドされた.dmgファイルを配布
+          name: Mac-App-Universal
+          path: dist/*.dmg # ビルドされたファイルをGitHub上に保存
