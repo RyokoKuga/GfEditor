@@ -2,7 +2,7 @@ name: Build Mac App (Universal)
 on:
   push:
     branches: [ "main" ] # mainブランチにpushされたら自動実行
-  workflow_dispatch:      # 手動で実行ボタンを押すことも可能にする
+  workflow_dispatch:      # 手動で実行ボタンを押すことも可能
 
 jobs:
   build:
