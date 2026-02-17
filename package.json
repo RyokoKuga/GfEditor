@@ -1,10 +1,26 @@
 {
   "name": "gf-editor",
   "version": "1.0.0",
+  "description": "GfEditor Desktop App",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --mac"
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "io.github.ryokokuga.gfeditor",
+    "mac": {
+      "icon": "icon.png",
+      "target": [
+        "dmg"
+      ],
+      "extendInfo": {
+        "LSMinimumSystemVersion": "10.13.0"
+      }
+    },
+    "directories": {
+      "output": "dist"
+    }
   },
   "devDependencies": {
     "electron": "^30.0.0",
