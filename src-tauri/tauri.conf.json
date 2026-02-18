@@ -16,7 +16,7 @@
         "height": 800,
         "resizable": true,
         "fullscreen": false,
-        "url": "items/calculation/main.html"
+        "url": "index.html"
       }
     ],
     "security": {
