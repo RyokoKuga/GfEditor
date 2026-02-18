@@ -1,0 +1,42 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "GfEditor",
+  "version": "0.1.0",
+  "identifier": "com.ryokokuga.gfeditor",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "frontendDist": "../public"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "GfEditor",
+        "width": 1000,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "url": "items/calculation/main.html"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "languages": ["Japanese"]
+      }
+    }
+  }
+}

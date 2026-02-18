@@ -1,0 +1,60 @@
+name: Build Desktop Apps (GfEditor)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest'
+            args: '--target universal-apple-darwin'
+            name: 'macOS-Universal'
+          - platform: 'windows-latest'
+            args: ''
+            name: 'Windows-x64'
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'x86_64-apple-darwin, aarch64-apple-darwin' || '' }}
+
+      - name: Install dependencies (npm)
+        run: npm install
+
+      - name: Build Tauri App
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ${{ matrix.args }}
+
+      - name: Prepare artifacts
+        run: |
+          mkdir dist_artifacts
+          find src-tauri/target -name "*.dmg" -exec cp {} dist_artifacts/ \;
+          find src-tauri/target -name "*.exe" -exec cp {} dist_artifacts/ \;
+          find src-tauri/target -name "*.msi" -exec cp {} dist_artifacts/ \;
+        shell: bash
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: GfEditor-${{ matrix.name }}
+          path: dist_artifacts/
