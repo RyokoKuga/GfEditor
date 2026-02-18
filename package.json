@@ -4,7 +4,6 @@
   "description": "**GfEditor** is a web-based support tool designed to seamlessly bridge the gap between molecular modeling and the generation of input files (`.inp`) for the quantum chemistry software **GAMESS**.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "tauri": "tauri"
   },
   "repository": {
@@ -20,6 +19,6 @@
   },
   "homepage": "https://github.com/RyokoKuga/GfEditor#readme",
   "devDependencies": {
-    "@tauri-apps/cli": "^2.1.0"
+    "@tauri-apps/cli": "^2.10.0"
   }
 }
