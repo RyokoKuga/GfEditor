@@ -33,6 +33,7 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
+          # macOSの場合はユニバーサル用のターゲットを追加、Windowsの場合は標準
           targets: ${{ matrix.platform == 'macos-latest' && 'x86_64-apple-darwin, aarch64-apple-darwin' || '' }}
 
       - name: Install dependencies (npm)
@@ -45,11 +46,24 @@ jobs:
         with:
           args: ${{ matrix.args }}
 
+      - name: Prepare artifacts
+        run: |
+          mkdir dist_artifacts
+          # --- Mac用: bundleフォルダ直下のdmgのみを抽出 ---
+          if [ "${{ matrix.platform }}" = "macos-latest" ]; then
+            find src-tauri/target/universal-apple-darwin/release/bundle/dmg -name "*.dmg" -exec cp {} dist_artifacts/ \;
+          fi
+          
+          # --- Windows用: nsis(exe) と msi フォルダの中から成果物のみを抽出 ---
+          # これにより中間生成物（build-script-build等）の混入防止
+          if [ "${{ matrix.platform }}" = "windows-latest" ]; then
+            find src-tauri/target/release/bundle/nsis -name "*.exe" -exec cp {} dist_artifacts/ \;
+            find src-tauri/target/release/bundle/msi -name "*.msi" -exec cp {} dist_artifacts/ \;
+          fi
+        shell: bash
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: G-Visualizer-${{ matrix.name }}
-          path: |
-            src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
-            src-tauri/target/release/bundle/msi/*.msi
-            src-tauri/target/release/bundle/nsis/*.exe
+          name: GfEditor-${{ matrix.name }}
+          path: dist_artifacts/
