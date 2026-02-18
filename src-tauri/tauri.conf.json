@@ -12,8 +12,8 @@
     "windows": [
       {
         "title": "GfEditor",
-        "width": 1000,
-        "height": 800,
+        "width": 1100,
+        "height": 900,
         "resizable": true,
         "fullscreen": false,
         "url": "index.html"
@@ -32,6 +32,12 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "oneClick": false,
+        "allowToChangeInstallationDirectory": true
+      }
+    }
   }
 }
